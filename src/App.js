@@ -3,35 +3,36 @@ import CreateList from "./Components/CreateList";
 import Lists from "./Components/Lists";
 
 function App(props) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [allData, setAllData] = useState([]);
   const [singleData, setSingleData] = useState({
-    title: "", 
+    title: "",
     author: ""
   });
 
   useEffect(() => {
-    getLists()
-  }, []);
+    if (loading) {
+      getLists()
+    }
+  }, [loading]);
+
 
   const getLists = () => {
-    setLoading( true , () => {
-      fetch("http://localhost:3000/posts")
+    fetch("http://localhost:3000/posts")
         .then(res => res.json())
-        .then(result =>
-            setLoading(false),
+        .then(result => {
+            setLoading(false)
             setAllData(result)
-        )
+        })
         .catch(console.log);
-    });
   }
 
   const handleChange = (event) => {
-    var title = singledata.title;
+    var title = singleData.title;
     var author = singleData.author;
     if (event.target.name === "title") title = event.target.value;
     else author = event.target.value;
-    setSingledata({
+    setSingleData({
         title: title,
         author: author
       });
@@ -53,12 +54,7 @@ function App(props) {
   }
 
   const getList = (event, id) => {
-    setSingleData({
-          title: "Loading...",
-          author: "Loading..."
-        },
-      () => {
-        fetch("http://localhost:3000/posts/" + id)
+    fetch("http://localhost:3000/posts/" + id)
           .then(res => res.json())
           .then(result => {
             setSingleData({
@@ -66,9 +62,7 @@ function App(props) {
                 author: result.author ? result.author : ""
               })
             });
-          });
       }
-  }
 
   const updateList = (event, id) => {
     fetch("http://localhost:3000/posts/" + id, {
@@ -134,5 +128,5 @@ function App(props) {
         {listTable}
       </div>
     );
-
+  } 
 export default App; 
