@@ -1,141 +1,117 @@
-import React from "react";
+import React,  { useState, useEffect } from "react";
 import CreateList from "./Components/CreateList";
 import Lists from "./Components/Lists";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loading: false,
-      alldata: [],
-      singledata: {
-        title: "",
-        author: ""
-      }
-    };
-    this.getLists = this.getLists.bind(this);
-    this.getList = this.getList.bind(this);
-    this.createList = this.createList.bind(this);
-    this.updateList = this.updateList.bind(this);
-    this.deleteList = this.deleteList.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-  }
+function App(props) {
+  const [loading, setLoading] = useState(false);
+  const [allData, setAllData] = useState([]);
+  const [singleData, setSingleData] = useState({
+    title: "", 
+    author: ""
+  });
 
-  getLists() {
-    this.setState({ loading: true }, () => {
+  useEffect(() => {
+    getLists()
+  }, []);
+
+  const getLists = () => {
+    setLoading( true , () => {
       fetch("http://localhost:3000/posts")
         .then(res => res.json())
         .then(result =>
-          this.setState({
-            loading: false,
-            alldata: result
-          })
+            setLoading(false),
+            setAllData(result)
         )
         .catch(console.log);
     });
   }
 
-  handleChange(event) {
-    var title = this.state.singledata.title;
-    var author = this.state.singledata.author;
+  const handleChange = (event) => {
+    var title = singledata.title;
+    var author = singleData.author;
     if (event.target.name === "title") title = event.target.value;
     else author = event.target.value;
-
-    this.setState({
-      singledata: {
+    setSingledata({
         title: title,
         author: author
-      }
-    });
+      });
   }
 
-  createList() {
+  const createList = () => {
     fetch("http://localhost:3000/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(this.state.singledata)
+      body: JSON.stringify(singleData)
     }).then(
-      this.setState({
-        singledata: {
+      setSingleData({
           title: "",
           author: ""
-        }
-      })
+        })
     );
   }
 
-  getList(event, id) {
-    this.setState(
-      {
-        singledata: {
+  const getList = (event, id) => {
+    setSingleData({
           title: "Loading...",
           author: "Loading..."
-        }
-      },
+        },
       () => {
         fetch("http://localhost:3000/posts/" + id)
           .then(res => res.json())
           .then(result => {
-            this.setState({
-              singledata: {
+            setSingleData({
                 title: result.title,
                 author: result.author ? result.author : ""
-              }
+              })
             });
           });
       }
-    );
   }
 
-  updateList(event, id) {
+  const updateList = (event, id) => {
     fetch("http://localhost:3000/posts/" + id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(this.state.singledata)
+      body: JSON.stringify(singleData)
     })
       .then(res => res.json())
       .then(result => {
-        this.setState({
-          singledata: {
+        setSingleData({
             title: "",
             author: ""
-          }
-        });
-        this.getLists();
+          });
+        getLists();
       });
   }
 
-  deleteList(event, id) {
+  const deleteList = (event, id) => {
     fetch("http://localhost:3000/posts/" + id, {
       method: "DELETE"
     })
       .then(res => res.json())
       .then(result => {
-        this.setState({
-          singledata: {
+        setSingleData({
             title: "",
             author: ""
-          }
-        });
-        this.getLists();
+          });
+        getLists();
       });
   }
 
-  render() {
-    const listTable = this.state.loading ? (
+    const listTable = loading ? (
       <span>Loading...Is usually slower than localhost...</span>
     ) : (
       <Lists
-        alldata={this.state.alldata}
-        singledata={this.state.singledata}
-        getList={this.getList}
-        updateList={this.updateList}
-        deleteList={this.deleteList}
-        handleChange={this.handleChange}
+        alldata={allData}
+        singledata={singleData}
+        getList={getList}
+        updateList={updateList}
+        deleteList={deleteList}
+        handleChange={handleChange}
       />
     );
     return (
@@ -144,21 +120,19 @@ class App extends React.Component {
           <button
             type="button"
             className="btn btn-primary"
-            onClick={this.getLists}
+            onClick={getLists}
           >
             Get Lists
           </button>
           <CreateList
-            singledata={this.state.singledata}
-            createList={this.createList}
-            handleChange={this.handleChange}
+            singledata={singleData}
+            createList={createList}
+            handleChange={handleChange}
           />
         </span>
         <br />
         {listTable}
       </div>
     );
-  }
-}
 
-export default App;
+export default App; 

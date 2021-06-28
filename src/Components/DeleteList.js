@@ -5,7 +5,7 @@ function DeleteList(props) {
     const dataTarget = '#'+modalIdentifier
     return (
       <React.Fragment>
-        
+
     <button type="button" className="btn btn-info" data-toggle="modal" data-target={dataTarget}
     onClick={(e)=>props.getList(e,props.elementId)}>Delete</button>
         <div className="modal fade" id={modalIdentifier} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -43,10 +43,10 @@ function DeleteList(props) {
             </div>
           </div>
         </div>
-  
+
         </React.Fragment>
     )
-    
+
   }
 
   export default DeleteList;
